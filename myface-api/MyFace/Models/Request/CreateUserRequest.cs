@@ -19,9 +19,12 @@ namespace MyFace.Models.Request
         [Required]
         [StringLength(70)]
         public string Username { get; set; }
-        
+        [Required]
+        [StringLength(70, MinimumLength = 8, ErrorMessage = "Password must be a minimum of 8 characters long")]
+        public string Password { get; set; }      
         public string ProfileImageUrl { get; set; }
         
         public string CoverImageUrl { get; set; }
     }
+    
 }

@@ -2,6 +2,9 @@
 using MyFace.Models.Request;
 using MyFace.Models.Response;
 using MyFace.Repositories;
+using System;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace MyFace.Controllers
 {
