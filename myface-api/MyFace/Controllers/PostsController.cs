@@ -7,21 +7,26 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System;
 using Microsoft.AspNetCore.Http;
+using MyFace.Services;
+using MyFace.Helpers;
 
 namespace MyFace.Controllers
 {
     [ApiController]
     [Route("/posts")]
     public class PostsController : ControllerBase
-    {    
+    {   
+        private readonly IAuthService _authService;
+
         private readonly IPostsRepo _posts;
 
         private readonly IUsersRepo _users;
 
-        public PostsController(IPostsRepo posts, IUsersRepo users)
+        public PostsController(IPostsRepo posts, IUsersRepo users, IAuthService auth)
         {
             _posts = posts;
             _users = users;
+            _authService = auth;
         }
         
         [HttpGet("")]
@@ -69,28 +74,35 @@ namespace MyFace.Controllers
             var username = usernamePasswordArray[0];
             var password = usernamePasswordArray[1];
 
-            User user;
-            try
-            {
-                user = _users.GetByUsername(username);
-            }
-            catch (InvalidOperationException e)
-            {
-                return Unauthorized("The username/password combination does not match");
-            }
+            // User user;
+            // try
+            // {
+            //     user = _users.GetByUsername(username);
+            // }
+            // catch (InvalidOperationException e)
+            // {
+            //     return Unauthorized("The username/password combination does not match");
+            // }
             
-            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: password,
-                salt: Convert.FromBase64String(user.Salt),
-                prf: KeyDerivationPrf.HMACSHA256,
-                iterationCount: 100000,
-                numBytesRequested: 256 / 8));
-            if (hashed != user.HashedPassword)
+            // string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+            //     password: password,
+            //     salt: Convert.FromBase64String(user.Salt),
+            //     prf: KeyDerivationPrf.HMACSHA256,
+            //     iterationCount: 100000,
+            //     numBytesRequested: 256 / 8));
+            // if (hashed != user.HashedPassword)
+            // {
+            //     return Unauthorized("The username/password combination does not match");
+            // }
+
+            if (!_authService.IsValidUsernameAndPassword(username, password))
             {
-                return Unauthorized("The username/password combination does not match");
+                return Unauthorized("The username and password are not valid");
             }
 
-             if (user.Id != newPost.UserId)
+            User user = _users.GetByUsername(username);
+
+            if (user.Id != newPost.UserId)
             {
                 return StatusCode(
                     StatusCodes.Status403Forbidden,
