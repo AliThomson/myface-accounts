@@ -4,7 +4,6 @@ using MyFace.Models.Response;
 using MyFace.Models.Database;
 using MyFace.Repositories;
 using Microsoft.Extensions.Primitives;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System;
 using Microsoft.AspNetCore.Http;
 using MyFace.Services;
@@ -74,27 +73,7 @@ namespace MyFace.Controllers
             var username = usernamePasswordArray[0];
             var password = usernamePasswordArray[1];
 
-            // User user;
-            // try
-            // {
-            //     user = _users.GetByUsername(username);
-            // }
-            // catch (InvalidOperationException e)
-            // {
-            //     return Unauthorized("The username/password combination does not match");
-            // }
-            
-            // string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-            //     password: password,
-            //     salt: Convert.FromBase64String(user.Salt),
-            //     prf: KeyDerivationPrf.HMACSHA256,
-            //     iterationCount: 100000,
-            //     numBytesRequested: 256 / 8));
-            // if (hashed != user.HashedPassword)
-            // {
-            //     return Unauthorized("The username/password combination does not match");
-            // }
-
+            //Console.WriteLine("username = " + username + " and password = " + password);
             if (!_authService.IsValidUsernameAndPassword(username, password))
             {
                 return Unauthorized("The username and password are not valid");
@@ -109,8 +88,7 @@ namespace MyFace.Controllers
                     "You are not allowed to create a post for a different user"
                 );
             }
-
-            
+           
             var post = _posts.Create(newPost);
 
             var url = Url.Action("GetById", new { id = post.Id });
