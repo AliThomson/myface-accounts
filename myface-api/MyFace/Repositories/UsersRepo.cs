@@ -5,6 +5,7 @@ using MyFace.Models.Request;
 using System;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using MyFace.Helpers;
 
 namespace MyFace.Repositories
 {
@@ -13,6 +14,7 @@ namespace MyFace.Repositories
         IEnumerable<User> Search(UserSearchRequest search);
         int Count(UserSearchRequest search);
         User GetById(int id);
+        User GetByUsername (string username);
         User Create(CreateUserRequest newUser);
         User Update(int id, UpdateUserRequest update);
         void Delete(int id);
@@ -60,24 +62,16 @@ namespace MyFace.Repositories
                 .Single(user => user.Id == id);
         }
 
+         public User GetByUsername(string username)
+        {
+            return _context.Users
+                .Single(user => user.Username == username);
+        }
+
         public User Create(CreateUserRequest newUser)
         {
-            string password = newUser.Password;
-            byte[] salt = new byte[128 / 8];
-            using (var rngCsp = new RNGCryptoServiceProvider())
-            {
-                rngCsp.GetNonZeroBytes(salt);
-            }
-            //Console.WriteLine($"Salt: {Convert.ToBase64String(salt)}");
-            string saltString = Convert.ToBase64String(salt);
-            // derive a 256-bit subkey (use HMACSHA256 with 100,000 iterations)
-            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: password,
-                salt: salt,
-                prf: KeyDerivationPrf.HMACSHA256,
-                iterationCount: 100000,
-                numBytesRequested: 256 / 8));
-            //Console.WriteLine($"Hashed: {hashed}");
+            var helper = new PasswordHelper();
+            var processor = helper.GetHashedPassword(newUser.Password);
 
             var insertResponse = _context.Users.Add(new User
             {
@@ -85,8 +79,8 @@ namespace MyFace.Repositories
                 LastName = newUser.LastName,
                 Email = newUser.Email,
                 Username = newUser.Username,
-                HashedPassword = hashed,
-                Salt = saltString,
+                HashedPassword = processor.HashedPassword,
+                Salt = processor.Salt,
                 ProfileImageUrl = newUser.ProfileImageUrl,
                 CoverImageUrl = newUser.CoverImageUrl,
             });

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System.Collections.Generic;
 using System.Linq;
 using MyFace.Models.Database;
+using MyFace.Helpers;
 
 namespace MyFace.Data
 {
@@ -121,23 +122,10 @@ namespace MyFace.Data
         }
 
         private static User CreateRandomUser(int index)
-            {
-                string password = "HashedPassword";
-                byte[] salt = new byte[128 / 8];
-                using (var rngCsp = new RNGCryptoServiceProvider())
-                {
-                    rngCsp.GetNonZeroBytes(salt);
-                }
-                //Console.WriteLine($"Salt: {Convert.ToBase64String(salt)}");
-                string saltString = Convert.ToBase64String(salt);
-                // derive a 256-bit subkey (use HMACSHA256 with 100,000 iterations)
-                string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                    password: password,
-                    salt: salt,
-                    prf: KeyDerivationPrf.HMACSHA256,
-                    iterationCount: 100000,
-                    numBytesRequested: 256 / 8));
-                //Console.WriteLine($"Hashed: {hashed}");
+        {
+            var helper = new PasswordHelper();
+            var processor = helper.GetHashedPassword("password246");
+            
         {
             return new User
             {
@@ -145,8 +133,8 @@ namespace MyFace.Data
                 LastName = Data[index][1],
                 Username = Data[index][2],
                 Email = Data[index][3],
-                HashedPassword = hashed,
-                Salt = saltString,
+                HashedPassword = processor.HashedPassword,
+                Salt = processor.Salt,
                 ProfileImageUrl = ImageGenerator.GetProfileImage(Data[index][2]),
                 CoverImageUrl = ImageGenerator.GetCoverImage(index),
             };
