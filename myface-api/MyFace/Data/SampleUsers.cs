@@ -126,8 +126,6 @@ namespace MyFace.Data
             var helper = new PasswordHelper();
             byte[] salt = helper.GetNewSalt();
             string hashedPword = helper.GetHashedPassword("password246", salt);
-            //var helper = new PasswordHelper();
-            //var processor = helper.GetHashedPassword("password246");
             string saltString = Convert.ToBase64String(salt);
             
         {
@@ -137,9 +135,7 @@ namespace MyFace.Data
                 LastName = Data[index][1],
                 Username = Data[index][2],
                 Email = Data[index][3],
-                //HashedPassword = processor.HashedPassword,
                 HashedPassword = hashedPword,
-                //Salt = processor.Salt,
                 Salt = saltString,
                 ProfileImageUrl = ImageGenerator.GetProfileImage(Data[index][2]),
                 CoverImageUrl = ImageGenerator.GetCoverImage(index),

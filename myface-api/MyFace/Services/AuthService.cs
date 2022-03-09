@@ -37,10 +37,12 @@ namespace MyFace.Services
             var helper = new PasswordHelper();
             string saltString = user.Salt;
             byte[] salt = Convert.FromBase64String(saltString);
-            string saltStringAfterConversion = Convert.ToBase64String(salt);
-
+            
             string hashed = helper.GetHashedPassword(password, salt);
-                        
+            //Console.WriteLine("Password = " + password + ", LoggedIn = " + hashed + ", dbPassword = " + user.HashedPassword);
+            string saltAfterConversion = Convert.ToBase64String(salt);
+            //Console.WriteLine("Salt = " + saltString + ", after conversion = "+ saltAfterConversion);     
+            
             if (hashed != user.HashedPassword)
             {
                 return false;

@@ -72,22 +72,16 @@ namespace MyFace.Repositories
         {
             var helper = new PasswordHelper();
             byte[] salt = helper.GetNewSalt();
-            string hashedPword = helper.GetHashedPassword("password246", salt);
-            //var helper = new PasswordHelper();
-            //var processor = helper.GetHashedPassword("password246");
+            string hashedPword = helper.GetHashedPassword(newUser.Password, salt);
             string saltString = Convert.ToBase64String(salt);
             
-            //var helper = new PasswordHelper();
-            //var processor = helper.GetHashedPassword(newUser.Password);
-
+            
             var insertResponse = _context.Users.Add(new User
             {
                 FirstName = newUser.FirstName,
                 LastName = newUser.LastName,
                 Email = newUser.Email,
                 Username = newUser.Username,
-                // HashedPassword = processor.HashedPassword,
-                // Salt = processor.Salt,
                 HashedPassword = hashedPword,
                 Salt = saltString,
                 ProfileImageUrl = newUser.ProfileImageUrl,

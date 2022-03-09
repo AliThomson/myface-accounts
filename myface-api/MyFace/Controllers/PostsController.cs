@@ -31,6 +31,32 @@ namespace MyFace.Controllers
         [HttpGet("")]
         public ActionResult<PostListResponse> Search([FromQuery] PostSearchRequest searchRequest)
         {
+            var authHeader = Request.Headers["Authorization"];
+
+            if (authHeader == StringValues.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var authHeaderString = authHeader[0];
+
+            var authHeaderSplit = authHeaderString.Split(' ');
+            var authType = authHeaderSplit[0];
+            var encodedUsernamePassword = authHeaderSplit[1];
+
+            var usernamePassword = System.Text.Encoding.UTF8.GetString(
+                Convert.FromBase64String(encodedUsernamePassword)
+            );
+
+            var usernamePasswordArray = usernamePassword.Split(':');
+
+            var username = usernamePasswordArray[0];
+            var password = usernamePasswordArray[1];
+            
+            if (!_authService.IsValidUsernameAndPassword(username, password))
+            {
+                return Unauthorized("The username and password are not valid");
+            }
             var posts = _posts.Search(searchRequest);
             var postCount = _posts.Count(searchRequest);
             return PostListResponse.Create(searchRequest, posts, postCount);
@@ -39,6 +65,33 @@ namespace MyFace.Controllers
         [HttpGet("{id}")]
         public ActionResult<PostResponse> GetById([FromRoute] int id)
         {
+            var authHeader = Request.Headers["Authorization"];
+
+            if (authHeader == StringValues.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var authHeaderString = authHeader[0];
+
+            var authHeaderSplit = authHeaderString.Split(' ');
+            var authType = authHeaderSplit[0];
+            var encodedUsernamePassword = authHeaderSplit[1];
+
+            var usernamePassword = System.Text.Encoding.UTF8.GetString(
+                Convert.FromBase64String(encodedUsernamePassword)
+            );
+
+            var usernamePasswordArray = usernamePassword.Split(':');
+
+            var username = usernamePasswordArray[0];
+            var password = usernamePasswordArray[1];
+
+            if (!_authService.IsValidUsernameAndPassword(username, password))
+            {
+                return Unauthorized("The username and password are not valid");
+            }
+
             var post = _posts.GetById(id);
             return new PostResponse(post);
         }
@@ -102,14 +155,84 @@ namespace MyFace.Controllers
             {
                 return BadRequest(ModelState);
             }
+            var authHeader = Request.Headers["Authorization"];
+
+            if (authHeader == StringValues.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var authHeaderString = authHeader[0];
+
+            var authHeaderSplit = authHeaderString.Split(' ');
+            var authType = authHeaderSplit[0];
+            var encodedUsernamePassword = authHeaderSplit[1];
+
+            var usernamePassword = System.Text.Encoding.UTF8.GetString(
+                Convert.FromBase64String(encodedUsernamePassword)
+            );
+
+            var usernamePasswordArray = usernamePassword.Split(':');
+
+            var username = usernamePasswordArray[0];
+            var password = usernamePasswordArray[1];
+
+            if (!_authService.IsValidUsernameAndPassword(username, password))
+            {
+                return Unauthorized("The username and password are not valid");
+            }
+            User user = _users.GetByUsername(username);
 
             var post = _posts.Update(id, update);
+            if (user.Id != post.UserId)
+            {
+                return StatusCode(
+                    StatusCodes.Status403Forbidden,
+                    "You are not allowed to update a post for a different user"
+                );
+            }
             return new PostResponse(post);
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete([FromRoute] int id)
         {
+            var authHeader = Request.Headers["Authorization"];
+
+            if (authHeader == StringValues.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var authHeaderString = authHeader[0];
+
+            var authHeaderSplit = authHeaderString.Split(' ');
+            var authType = authHeaderSplit[0];
+            var encodedUsernamePassword = authHeaderSplit[1];
+
+            var usernamePassword = System.Text.Encoding.UTF8.GetString(
+                Convert.FromBase64String(encodedUsernamePassword)
+            );
+
+            var usernamePasswordArray = usernamePassword.Split(':');
+
+            var username = usernamePasswordArray[0];
+            var password = usernamePasswordArray[1];
+
+            if (!_authService.IsValidUsernameAndPassword(username, password))
+            {
+                return Unauthorized("The username and password are not valid");
+            }
+            User user = _users.GetByUsername(username);
+
+            var post = _posts.GetById(id);
+            if (user.Id != post.UserId)
+            {
+                return StatusCode(
+                    StatusCodes.Status403Forbidden,
+                    "You are not allowed to delete a post for a different user"
+                );
+            }
             _posts.Delete(id);
             return Ok();
         }
