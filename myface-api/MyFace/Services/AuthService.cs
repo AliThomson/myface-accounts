@@ -36,12 +36,14 @@ namespace MyFace.Services
             // hash user's password and check it
             var helper = new PasswordHelper();
             string saltString = user.Salt;
-            byte[] salt = Encoding.UTF8.GetBytes(saltString);
+            byte[] salt = Convert.FromBase64String(saltString);
+            string saltStringAfterConversion = Convert.ToBase64String(salt);
 
             string hashed = helper.GetHashedPassword(password, salt);
                         
             //string hashed = hashedPword;
-            //Console.WriteLine("hashed = " + hashed);
+            Console.Write("SaltString = " + saltString + ", saltStringAfterConversion = " + saltStringAfterConversion);
+            Console.WriteLine("AuthService:username = " + username + " hashed = " + hashed + " user.HashedPassword = " + user.HashedPassword);
 
             if (hashed != user.HashedPassword)
             {
