@@ -73,7 +73,6 @@ namespace MyFace.Controllers
             var username = usernamePasswordArray[0];
             var password = usernamePasswordArray[1];
 
-            Console.WriteLine("PostController:username = " + username + " and password = " + password);
             if (!_authService.IsValidUsernameAndPassword(username, password))
             {
                 return Unauthorized("The username and password are not valid");

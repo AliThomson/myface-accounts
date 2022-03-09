@@ -41,10 +41,6 @@ namespace MyFace.Services
 
             string hashed = helper.GetHashedPassword(password, salt);
                         
-            //string hashed = hashedPword;
-            Console.Write("SaltString = " + saltString + ", saltStringAfterConversion = " + saltStringAfterConversion);
-            Console.WriteLine("AuthService:username = " + username + " hashed = " + hashed + " user.HashedPassword = " + user.HashedPassword);
-
             if (hashed != user.HashedPassword)
             {
                 return false;
