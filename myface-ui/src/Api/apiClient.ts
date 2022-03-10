@@ -40,13 +40,42 @@ export interface NewPost {
     userId: number;
 }
 
-export async function fetchUsers(searchTerm: string, page: number, pageSize: number): Promise<ListResponse<User>> {
-    const response = await fetch(`https://localhost:5001/users?search=${searchTerm}&page=${page}&pageSize=${pageSize}`);
+function getAuthHeader(username: string, password: string)
+{
+    return `Basic ${btoa(`${username}:${password}`)}`;
+}
+
+export async function fetchUsers(searchTerm: string, page: number, pageSize: number, username: string, password: string): Promise<ListResponse<User>> {
+    const response = await fetch(`https://localhost:5001/users?search=${searchTerm}&page=${page}&pageSize=${pageSize}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": getAuthHeader(username, password),
+        },
+        body: JSON.stringify(searchTerm),
+    });
+   
+    if (!response.ok) {
+        throw new Error(await response.json())
+    }
+
     return await response.json();
 }
 
-export async function fetchUser(userId: string | number): Promise<User> {
-    const response = await fetch(`https://localhost:5001/users/${userId}`);
+export async function fetchUser(userId: string | number, username: string, password: string): Promise<User> {
+    const response = await fetch(`https://localhost:5001/users/${userId}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": getAuthHeader(username, password),
+        },
+        body: JSON.stringify(userId),
+    });
+    
+    if (!response.ok) {
+        throw new Error(await response.json())
+    }
+
     return await response.json();
 }
 
@@ -70,11 +99,12 @@ export async function fetchPostsDislikedBy(page: number, pageSize: number, userI
     return await response.json();
 }
 
-export async function createPost(newPost: NewPost) {
+export async function createPost(newPost: NewPost, username: string, password: string) {
     const response = await fetch(`https://localhost:5001/posts/create`, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": getAuthHeader(username, password),
         },
         body: JSON.stringify(newPost),
     });

@@ -1,16 +1,20 @@
-﻿import React, {useEffect, useState} from 'react';
+﻿import React, {useEffect, useState, useContext} from 'react';
 import {fetchUser, User} from "../../Api/apiClient";
 import "./UserDetails.scss";
+import { LoginContext } from "../../Components/LoginManager/LoginManager";
+
 
 interface UserDetailsProps {
     userId: string;
 }
 
+
 export function UserDetails(props: UserDetailsProps): JSX.Element {
     const [user, setUser] = useState<User | null>(null);
-    
+    const { username, password } = useContext(LoginContext);
+
     useEffect(() => {
-        fetchUser(props.userId)
+        fetchUser(props.userId, username as string, password as string)
             .then(response => setUser(response));
     }, [props]);
     
