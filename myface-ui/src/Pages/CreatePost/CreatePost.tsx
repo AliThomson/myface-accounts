@@ -12,14 +12,15 @@ type FormStatus = "READY" | "SUBMITTING" | "ERROR" | "FINISHED"
 export function CreatePostForm(): JSX.Element {
     const [message, setMessage] = useState("");
     const [imageUrl, setImageUrl] = useState("");
-    const [userId, setUserId] = useState("");
     const [status, setStatus] = useState<FormStatus>("READY");
     const { logOut, username, password } = useContext(LoginContext);
+    
+    
 
     function submitForm(event: FormEvent) {
         event.preventDefault();
         setStatus("SUBMITTING");
-        createPost({message, imageUrl, userId: parseInt(userId)}, username as string, password as string)
+        createPost({message, imageUrl}, username as string, password as string)
             .then(() => setStatus("FINISHED"))
             .catch(() => {
                 logOut();
@@ -44,11 +45,6 @@ export function CreatePostForm(): JSX.Element {
             <label className="form-label">
                 Image URL
                 <input className="form-input" value={imageUrl} onChange={event => setImageUrl(event.target.value)}/>
-            </label>
-
-            <label className="form-label">
-                User ID
-                <input className="form-input" value={userId} onChange={event => setUserId(event.target.value)}/>
             </label>
 
             <button className="submit-button" disabled={status === "SUBMITTING"} type="submit">Create Post</button>
