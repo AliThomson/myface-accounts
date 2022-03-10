@@ -14,14 +14,17 @@ export function CreatePostForm(): JSX.Element {
     const [imageUrl, setImageUrl] = useState("");
     const [userId, setUserId] = useState("");
     const [status, setStatus] = useState<FormStatus>("READY");
-    const { username, password } = useContext(LoginContext);
+    const { logOut, username, password } = useContext(LoginContext);
 
     function submitForm(event: FormEvent) {
         event.preventDefault();
         setStatus("SUBMITTING");
         createPost({message, imageUrl, userId: parseInt(userId)}, username as string, password as string)
             .then(() => setStatus("FINISHED"))
-            .catch(() => setStatus("ERROR"));
+            .catch(() => {
+                logOut();
+                setStatus("ERROR");
+            });
     }
     
     if (status === "FINISHED") {
