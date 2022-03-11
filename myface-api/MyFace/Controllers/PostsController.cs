@@ -133,6 +133,7 @@ namespace MyFace.Controllers
 
             User user = _users.GetByUsername(username);
 
+<<<<<<< HEAD
             newPost.UserId = user.Id;
             Console.WriteLine("newPost.UserId = " + newPost.UserId);
             // if (user.Id != newPost.UserId)
@@ -142,8 +143,11 @@ namespace MyFace.Controllers
             //         "You are not allowed to create a post for a different user"
             //     );
             // }
+=======
+
+>>>>>>> c1d3e296ce21fb1f17b776c541b1aaea108f18ed
            
-            var post = _posts.Create(newPost);
+            var post = _posts.Create(newPost, user.Id);
 
             var url = Url.Action("GetById", new { id = post.Id });
             var postResponse = new PostResponse(post);
