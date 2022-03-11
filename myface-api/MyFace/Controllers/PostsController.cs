@@ -133,13 +133,15 @@ namespace MyFace.Controllers
 
             User user = _users.GetByUsername(username);
 
-            if (user.Id != newPost.UserId)
-            {
-                return StatusCode(
-                    StatusCodes.Status403Forbidden,
-                    "You are not allowed to create a post for a different user"
-                );
-            }
+            newPost.UserId = user.Id;
+            Console.WriteLine("newPost.UserId = " + newPost.UserId);
+            // if (user.Id != newPost.UserId)
+            // {
+            //     return StatusCode(
+            //         StatusCodes.Status403Forbidden,
+            //         "You are not allowed to create a post for a different user"
+            //     );
+            // }
            
             var post = _posts.Create(newPost);
 
