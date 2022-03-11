@@ -194,8 +194,66 @@ namespace MyFace.Controllers
                     "You are not allowed to delete a different user"
                 );
             }
+            else if (loggedInUser.Role == 0) 
+            {
+                return StatusCode(
+                    StatusCodes.Status403Forbidden,
+                    "You do not have the permissions to perform this action"
+                );
+            }
             _users.Delete(id);
             return Ok();
+        }
+
+
+        public ActionResult<UserResponse> UpdateRole([FromRoute] int id, [FromBody] UpdateUserRequest update)
+        {
+
+             if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var authHeader = Request.Headers["Authorization"];
+            //Console.WriteLine("on line 64 authheader = " + authHeader[0]);
+
+            if (authHeader == StringValues.Empty)
+            {
+                return Unauthorized();
+            }
+
+            var authHeaderString = authHeader[0];
+
+            var authHeaderSplit = authHeaderString.Split(' ');
+            var authType = authHeaderSplit[0];
+            var encodedUsernamePassword = authHeaderSplit[1];
+
+            var usernamePassword = System.Text.Encoding.UTF8.GetString(
+                Convert.FromBase64String(encodedUsernamePassword)
+            );
+
+            var usernamePasswordArray = usernamePassword.Split(':');
+
+            var username = usernamePasswordArray[0];
+            var password = usernamePasswordArray[1];
+            
+            if (!_authService.IsValidUsernameAndPassword(username, password))
+            {
+                return Unauthorized("The username and password are not valid");
+            }
+
+            User loggedInUser = _users.GetByUsername(username);
+            var user = _users.UpdateRole(id, update);
+
+
+            if (loggedInUser.Role == Role.Member) {
+                return StatusCode(
+                    StatusCodes.Status403Forbidden,
+                    "You do not have the permissions to perform this action"
+                );
+            }
+           
+        return new UserResponse(user);
         }
     }
 }

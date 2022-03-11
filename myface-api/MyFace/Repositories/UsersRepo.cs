@@ -17,6 +17,8 @@ namespace MyFace.Repositories
         User GetByUsername(string username);
         User Create(CreateUserRequest newUser);
         User Update(int id, UpdateUserRequest update);
+
+        User UpdateRole(int id, UpdateUserRequest update);
         void Delete(int id);
     }
     
@@ -62,7 +64,7 @@ namespace MyFace.Repositories
                 .Single(user => user.Id == id);
         }
 
-         public User GetByUsername(string username)
+        public User GetByUsername(string username)
         {
             return _context.Users
                 .Single(user => user.Username == username);
@@ -102,6 +104,18 @@ namespace MyFace.Repositories
             user.Email = update.Email;
             user.ProfileImageUrl = update.ProfileImageUrl;
             user.CoverImageUrl = update.CoverImageUrl;
+
+            _context.Users.Update(user);
+            _context.SaveChanges();
+
+            return user;
+        }
+
+        public User UpdateRole(int id, UpdateUserRequest update)
+        {
+            var user = GetById(id);
+
+            user.Role = update.Role;
 
             _context.Users.Update(user);
             _context.SaveChanges();
