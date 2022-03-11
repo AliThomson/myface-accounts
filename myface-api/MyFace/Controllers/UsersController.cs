@@ -205,7 +205,7 @@ namespace MyFace.Controllers
             return Ok();
         }
 
-
+        [HttpPatch("{id}/updaterole")]
         public ActionResult<UserResponse> UpdateRole([FromRoute] int id, [FromBody] UpdateUserRequest update)
         {
 

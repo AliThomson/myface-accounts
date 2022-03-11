@@ -1,4 +1,8 @@
-﻿export interface ListResponse<T> {
+﻿import { ByRoleOptions } from "@testing-library/react";
+import internal from "stream";
+import { EnumDeclaration } from "typescript";
+
+export interface ListResponse<T> {
     items: T[];
     totalNumberOfItems: number;
     page: number;
@@ -15,6 +19,7 @@ export interface User {
     email: string;
     profileImageUrl: string;
     coverImageUrl: string;
+    // role: number;
 }
 
 export interface Interaction {
@@ -46,12 +51,11 @@ function getAuthHeader(username: string, password: string)
 
 export async function fetchUsers(searchTerm: string, page: number, pageSize: number, username: string, password: string): Promise<ListResponse<User>> {
     const response = await fetch(`https://localhost:5001/users?search=${searchTerm}&page=${page}&pageSize=${pageSize}`, {
-        method: "POST",
+        method: "GET",
         headers: {
             "Content-Type": "application/json",
             "Authorization": getAuthHeader(username, password),
         },
-        body: JSON.stringify(searchTerm),
     });
    
     if (!response.ok) {
@@ -63,12 +67,11 @@ export async function fetchUsers(searchTerm: string, page: number, pageSize: num
 
 export async function fetchUser(userId: string | number, username: string, password: string): Promise<User> {
     const response = await fetch(`https://localhost:5001/users/${userId}`, {
-        method: "POST",
+        method: "GET",
         headers: {
             "Content-Type": "application/json",
             "Authorization": getAuthHeader(username, password),
         },
-        body: JSON.stringify(userId),
     });
     
     if (!response.ok) {
